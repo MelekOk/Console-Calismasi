@@ -1,0 +1,56 @@
+namespace SinifListesi
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.Write("Kişi sayısını girin: ");
+            int kisiSayisi=Convert.ToInt32(Console.ReadLine());
+            Console.Write("Özellik sayısını girin: ");
+            int ozellik = Convert.ToInt32(Console.ReadLine());
+         
+
+            string[,] sinifListesi= new string[kisiSayisi, ozellik];
+
+            string[] ozellikBaslik = new string[ozellik];
+            for (int i = 0; i < ozellikBaslik.Length; i++)
+            {
+                Console.Write((i + 1) + ". Özellik ismini girin: ");
+                ozellikBaslik[i] = Console.ReadLine();
+            }
+
+            Console.WriteLine("Kişi Özelliklerini Girmek için Bir Tuşa Basınız");
+            Console.ReadLine();
+            Console.WriteLine("-------------------------------");
+            for (int i = 0; i < sinifListesi.GetLength(0); i++)
+            {
+                Console.WriteLine((i + 1) + ". Kişi Bilgilerini Giriniz");
+                Console.WriteLine("-------------------------------");
+                for (int j = 0; j < sinifListesi.GetLength(1); j++)
+                {
+                    Console.Write(ozellikBaslik[j] + " : ");
+                    sinifListesi[i, j] = Console.ReadLine();
+                }
+            }
+
+
+            Console.WriteLine("-------------------------------");
+            Console.WriteLine("Sınıfı Listelemek İçin Bir Tuşa Basınız");
+            Console.ReadLine();
+            Console.WriteLine("-------------------------------");
+            Console.WriteLine("------ Sınıf Listesi -------");
+            Console.WriteLine("-------------------------------");
+
+            for (int i = 0; i < sinifListesi.GetLength(0); i++)
+            {
+                Console.WriteLine((i + 1) + ". Kişi");
+                for (int j = 0; j < sinifListesi.GetLength(1); j++)
+                {
+                    Console.WriteLine(ozellikBaslik[j] + " : " + sinifListesi[i, j]);                
+                }
+                Console.WriteLine("-------------------------------");
+            }
+
+        }
+    }
+}
