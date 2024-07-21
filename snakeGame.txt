@@ -1,0 +1,248 @@
+namespace SnakeGame
+{
+    internal class Program
+    {
+        static int id = 0;
+        static int skor = 0;
+        static int sure = 0;
+        static string oyuncuAdi;
+        static bool oyunDevam = false; 
+        static string[,] oyuncular = new string[5, 3];
+        static char[,] cerceve = new char[20, 50];
+        static Random rnd = new Random();
+
+        static void Main(string[] args)
+        {
+            while (true)
+            {
+                Menu();
+            }
+        }
+
+        static void Menu()
+        {
+            bool status = true;
+            while (status)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.Clear();
+                Console.SetCursorPosition(0, 3);
+                Console.WriteLine("1 - Oyuna Başla");
+                Console.WriteLine("2 - Skor Listesi");
+                Console.WriteLine("0 - Çıkış");
+                Console.Write("Seçiminiz : ");
+                int selection;
+                bool selectionStatus = int.TryParse(Console.ReadLine(), out selection);
+
+                if (selectionStatus)
+                {
+                    Console.Clear();
+                    switch (selection)
+                    {
+                        case 1:
+                            if (id < oyuncular.GetLength(0))
+                            {
+                                Console.Write("Oyuncu Adı : ");
+                                oyuncuAdi = Console.ReadLine();
+                                oyuncular[id, 0] = oyuncuAdi;
+                                oyuncular[id, 1] = "0";
+                                oyuncular[id, 2] = "0";
+                                id++;
+
+                                OyunaBasla(id - 1);
+                            }
+                            else
+                            {
+                                Console.WriteLine("Oyuncu kapasitesi dolmuş. Lütfen skor listesini kontrol edin.");
+                                Console.ReadLine();
+                            }
+                            break;
+                        case 2:
+                            SkorListesi();
+                            break;
+                        case 0:
+                            status = false;
+                            Console.WriteLine("Sistem Çıkışı...");
+                            Console.ReadLine();
+                            break;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Seçilen Fonksiyon Bulunamadı.");
+                    Console.ReadLine();
+                }
+            }
+        }
+
+        static void SureveSkorGuncelle()
+        {
+            int i = 0;
+            while (oyunDevam)
+            {
+                Thread.Sleep(1000);
+                i++;
+                sure = i;
+                Console.SetCursorPosition(0, 0);
+                Console.Write("Süre : " + sure);
+
+                Console.SetCursorPosition(20, 0);
+                Console.Write("Skor : " + skor);
+            }
+        }
+
+        static void CerceveCizimi(char[,] cerceve)
+        {
+            char ustAlt = '-';
+            char yan = '|';
+
+            for (int i = 0; i < 20; i++)
+            {
+                for (int j = 0; j < 50; j++)
+                {
+                    cerceve[i, j] = ' ';
+                }
+            }
+            for (int i = 0; i < 50; i++)
+            {
+                cerceve[0, i] = ustAlt;
+                cerceve[19, i] = ustAlt;
+            }
+            for (int i = 0; i < 20; i++)
+            {
+                cerceve[i, 0] = yan;
+                cerceve[i, 49] = yan;
+            }
+        }
+
+        static void OyunaBasla(int oyuncuId)
+        {
+            Console.Clear();
+
+            oyunDevam = true;
+            skor = 0;
+            sure = 0;
+            Thread t = new Thread(new ThreadStart(SureveSkorGuncelle));
+            t.Start();
+
+            int yemSatir = rnd.Next(1, 18);
+            int yemSutun = rnd.Next(1, 48);
+            int yilanBoyut = 1;
+            int satir = 10;
+            int sutun = 25;
+            string yon = "sag";
+            bool yediMi = false;
+
+            CerceveCizimi(cerceve);
+
+            Console.SetCursorPosition(0, 5);
+            for (int i = 0; i < 20; i++)
+            {
+                for (int j = 0; j < 50; j++)
+                {
+                    Console.Write(cerceve[i, j]);
+                }
+                Console.WriteLine();
+            }
+
+            while (oyunDevam)
+            {
+                Console.SetCursorPosition(yemSutun, yemSatir + 5);
+                Console.Write("■");
+                Console.SetCursorPosition(sutun, satir + 5);
+                Console.Write("█");
+
+                ConsoleKeyInfo key = Console.ReadKey(true);
+
+                if (key.Key == ConsoleKey.UpArrow)
+                {
+                    yon = "yukari";
+                }
+                else if (key.Key == ConsoleKey.DownArrow)
+                {
+                    yon = "asagi";
+                }
+                else if (key.Key == ConsoleKey.LeftArrow)
+                {
+                    yon = "sol";
+                }
+                else if (key.Key == ConsoleKey.RightArrow)
+                {
+                    yon = "sag";
+                }
+                else
+                {
+                    oyunDevam = false;
+                    break;
+                }
+
+                Console.SetCursorPosition(sutun, satir + 5);
+                Console.Write(' ');
+
+                Console.SetCursorPosition(yemSutun, yemSatir + 5);
+                Console.Write(' ');
+
+                if (yemSutun == sutun && yemSatir == satir)
+                {
+                    yediMi = true;
+                    yilanBoyut++;
+                }
+
+                if (yon == "sag")
+                {
+                    sutun++;
+                }
+                else if (yon == "sol")
+                {
+                    sutun--;
+                }
+                else if (yon == "yukari")
+                {
+                    satir--;
+                }
+                else if (yon == "asagi")
+                {
+                    satir++;
+                }
+                if (satir < 1 || satir >= 19 || sutun < 1 || sutun >= 49)
+                {
+                    oyunDevam = false;
+                    break;
+                }
+                if (satir == yemSatir && sutun == yemSutun)
+                {
+                    yilanBoyut++;
+                    skor += 10;
+                    yemSatir = rnd.Next(1, 18);
+                    yemSutun = rnd.Next(1, 48);
+                }
+            }
+            oyunDevam = false;
+            t.Join();
+            oyuncular[oyuncuId, 0] = oyuncuAdi;
+            oyuncular[oyuncuId, 1] = skor.ToString();
+            oyuncular[oyuncuId, 2] = sure.ToString();
+            Console.Clear();
+
+            Console.SetCursorPosition(0, 3);
+            Console.WriteLine("Oyun Bitti! \nSkorunuz: " + skor + "\t Süreniz: " + sure);
+            Console.WriteLine("Menüye dönmek için herhangi bir tuşa basın.");
+            Console.ReadKey();
+        }
+
+        static void SkorListesi()
+        {
+            Console.Clear();
+            Console.WriteLine("------Skor Listesi------");
+            for (int i = 0; i < oyuncular.GetLength(0); i++)
+            {
+                if (!String.IsNullOrWhiteSpace(oyuncular[i, 0]))
+                {
+                    Console.WriteLine($"Oyuncu Adı: {oyuncular[i, 0]}, \t Skor: {oyuncular[i, 1]}, \t Süre: {oyuncular[i, 2]}");
+                }
+            }
+            Console.ReadLine();
+        }
+
+    }
+}
